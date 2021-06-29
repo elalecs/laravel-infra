@@ -1,0 +1,25 @@
+#!/bin/bash
+
+MYAPP=$1
+shift 1
+
+if test -z "$MYAPP"
+then
+    echo "App no especificado"
+    exit 1
+fi
+
+MYCMD=$1
+shift 1
+
+if test -z "$MYCMD"
+then
+    echo "Comando no definido (composer o artisan)"
+    exit 1
+fi
+
+#echo $MYAPP && echo $MYCMD && echo "$@"
+
+printf "%s: %s %s" $MYAPP $MYCMD $@; echo
+
+docker-compose exec php bash -c "cd $MYAPP && $MYCMD '$@'"

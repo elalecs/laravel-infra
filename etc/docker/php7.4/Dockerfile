@@ -1,0 +1,24 @@
+FROM php:7.4-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libsodium23 libsodium-dev \
+    zip unzip libzip4 libzip-dev \
+    nodejs npm vim
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install imap pdo pdo_mysql opcache mbstring exif pcntl bcmath gd sodium zip
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www
