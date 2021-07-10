@@ -18,8 +18,12 @@ then
     exit 1
 fi
 
+if [ "$MYCMD" = "artisan" ]; then
+  MYCMD="php artisan"
+fi
+
 #echo $MYAPP && echo $MYCMD && echo "$@"
 
-printf "%s: %s %s" $MYAPP $MYCMD $@; echo
+printf "%s;%s;%s" $MYAPP $MYCMD $@; echo
 
-docker-compose exec php bash -c "cd $MYAPP && $MYCMD '$@'"
+docker-compose exec php bash -c "cd $MYAPP && $MYCMD $@"
