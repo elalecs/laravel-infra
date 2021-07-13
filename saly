@@ -1,29 +1,65 @@
 #!/bin/bash
 
-MYAPP=$1
-shift 1
-
-if test -z "$MYAPP"
-then
-    echo "App no especificado"
+if [ "$1" == "-v" ] || [ "$1" == "--version" ]; then
+    echo "Versión beta, comando para correr los comandos artisan, composer o npm dentro del contenedor"
     exit 1
+fi
+
+BASEPWD=${PWD##*/}
+
+DCFILE="docker-compose.yml"
+
+if [ "$BASEPWD" = "infra" ]; then
+    MYAPP=$1
+    shift 1
+else
+    MYAPP=$BASEPWD
+    DCFILE="../infra/docker-compose.yml"
 fi
 
 MYCMD=$1
-shift 1
 
-if test -z "$MYCMD"
-then
-    echo "Comando no definido (composer o artisan)"
+if [ "$MYCMD" == "artisan" ] || [ "$MYCMD" == "a" ]; then
+    shift 1
+    docker-compose \
+        -f $DCFILE \
+        exec \
+        -w "/var/www/$MYAPP" \
+        php \
+        php artisan "$@"
+elif [ "$MYCMD" == "composer" ] || [ "$MYCMD" == "c" ]; then
+    shift 1
+    docker-compose \
+        -f $DCFILE \
+        exec \
+        -w "/var/www/$MYAPP" \
+        php \
+        composer "$@"
+elif [ "$MYCMD" = "npm" ]; then
+    shift 1
+    docker-compose \
+        -f $DCFILE \
+        exec \
+        -w "/var/www/$MYAPP" \
+        php \
+        npm "$@"
+elif [ "$MYCMD" == "bash" ] || [ "$MYCMD" == "sh" ]; then
+    shift 1
+    docker-compose \
+        -f $DCFILE \
+        exec \
+        -w "/var/www/$MYAPP" \
+        php \
+        bash
+elif [ "$MYCMD" = "x" ]; then
+    shift 1
+    docker-compose \
+        -f $DCFILE \
+        exec \
+        -w "/var/www/$MYAPP" \
+        php \
+        "$@"
+else
+    echo "Comando no definido (composer | c, artisan | a o npm)"
     exit 1
 fi
-
-if [ "$MYCMD" = "artisan" ]; then
-  MYCMD="php artisan"
-fi
-
-#echo $MYAPP && echo $MYCMD && echo "$@"
-
-printf "%s;%s;%s" $MYAPP $MYCMD $@; echo
-
-docker-compose exec php bash -c "cd $MYAPP && $MYCMD $@"
