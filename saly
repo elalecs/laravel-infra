@@ -5,6 +5,12 @@ if [ "$1" == "-v" ] || [ "$1" == "--version" ]; then
     exit 1
 fi
 
+if [ "$1" == "-a" ] || [ "$1" == "--alias" ]; then
+    alias saly=../infra/saly
+    echo "Alias definido"
+    exit 1
+fi
+
 BASEPWD=${PWD##*/}
 
 DCFILE="docker-compose.yml"
