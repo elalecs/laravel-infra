@@ -11,6 +11,15 @@ if [ "$1" == "-a" ] || [ "$1" == "--alias" ]; then
     exit 1
 fi
 
+if [ "$1" == "dns" ] || [ "$1" == "--dns" ]; then
+    sudo networksetup -setdnsservers Wi-Fi 127.0.0.1 8.8.8.8
+    sudo killall -HUP mDNSResponder
+    sudo dscacheutil -flushcache
+    dig -4 A test.test
+    echo "Alias definido"
+    exit 1
+fi
+
 BASEPWD=${PWD##*/}
 
 DCFILE="docker-compose.yml"
